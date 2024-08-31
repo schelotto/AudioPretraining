@@ -1,0 +1,17 @@
+{
+  "model_name_or_path": "facebook/wav2vec2-base",
+  "dataset_name": "common_voice",
+  "dataset_config_names": ["en"],
+  "dataset_split_names": ["train"],
+  "audio_column_name": "audio",
+  "max_duration_in_seconds": 5.0,
+  "min_duration_in_seconds": 3.0,
+  "preprocessing_num_workers": 4,
+  "validation_split_percentage": 1,
+  "output_dir": "./wav2vec2_pretrained",
+  "per_device_train_batch_size": 16,
+  "num_train_epochs": 3,
+  "logging_steps": 500,
+  "save_steps": 500,
+  "seed": 42
+}
