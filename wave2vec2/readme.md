@@ -22,7 +22,7 @@ Ensure you have the following dependencies installed:
 
 - Python 3.7+
 - PyTorch 1.7+
-- Hugging Face Transformers 4.0+
+- HuggingFace Transformers 4.0+
 - Datasets library 1.6+
 - Other dependencies specified in `requirements.txt` (if applicable)
 
