@@ -1,6 +1,6 @@
 # Wav2Vec2 Pretraining
 
-![Project Logo](logo/wav2vec2.png)
+<img src="logo/wav2vec2.png" alt="Project Logo" width="300"/>
 
 ---
 
