@@ -91,23 +91,3 @@ class EncodecModelForPretraining(EncodecModel):
             )
         else:
             return (loss, x_hat) if loss is not None else (x_hat, output.audio_codes)
-
-    def discriminator_loss(self, real_audio, generated_audio):
-        """
-        Compute the discriminator loss for updating the discriminator.
-        This method is separate from the forward pass to allow alternating updates.
-
-        Args:
-            real_audio (torch.Tensor): Real audio tensor.
-            generated_audio (torch.Tensor): Generated audio tensor by the model.
-
-        Returns:
-            loss (torch.Tensor): Computed discriminator loss.
-        """
-        real_logits, _ = self.discriminator(real_audio)
-        generated_logits, _ = self.discriminator(generated_audio.detach())
-
-        real_loss = sum(torch.mean(torch.clamp(1.0 - logit, min=0.0)) for logit in real_logits)
-        generated_loss = sum(torch.mean(torch.clamp(1.0 + logit, min=0.0)) for logit in generated_logits)
-
-        return (real_loss + generated_loss) / len(real_logits)
