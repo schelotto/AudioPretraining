@@ -74,7 +74,7 @@ def load_and_prepare_datasets(data_args: DataArguments, feature_extractor: Wav2V
 
 def create_model(model_args: ModelArguments) -> Wav2Vec2ForPreTraining:
     config = Wav2Vec2Config.from_pretrained(model_args.model_name_or_path)
-    model = Wav2Vec2ForPreTraining.from_pretrained(model_args.model_name_or_path, config=config)
+    model = Wav2Vec2ForPreTraining(config)
     if model_args.freeze_feature_extractor:
         model.freeze_feature_encoder()
     return model
