@@ -2,6 +2,8 @@ from datasets import load_dataset, concatenate_datasets, DatasetDict
 from typing import List
 from transformers import AutoProcessor, EncodecFeatureExtractor
 
+import datasets
+
 
 def combine_datasets(
         dataset_paths: List[str],
@@ -60,8 +62,7 @@ def prepare_datasets(
         audio_column_name: str = "audio",
         max_duration_in_seconds: float = 10.0,
         min_duration_in_seconds: float = 1.0,
-        sampling_rate: int = 24000,
-        preprocessing_num_workers: int = 4
+        preprocessing_num_workers: int = 8
 ) -> DatasetDict:
     """
     Prepare the datasets for training by applying feature extraction and filtering based on duration.
@@ -72,22 +73,27 @@ def prepare_datasets(
         audio_column_name (str): The column name containing the audio samples.
         max_duration_in_seconds (float): Maximum duration of audio samples in seconds.
         min_duration_in_seconds (float): Minimum duration of audio samples in seconds.
-        sampling_rate (int): The sampling rate of the audio samples.
         preprocessing_num_workers (int): Number of workers to use for preprocessing.
 
     Returns:
         DatasetDict: A dictionary containing the processed training and validation datasets.
     """
+    sampling_rate = feature_extractor.sampling_rate
     max_length = int(max_duration_in_seconds * sampling_rate)
     min_length = int(min_duration_in_seconds * sampling_rate)
+
+    dataset_dict = dataset_dict.cast_column(
+        audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
+    )
 
     def prepare_dataset(batch):
         sample = batch[audio_column_name]
         inputs = feature_extractor(
-            sample, sampling_rate=sampling_rate, max_length=max_length, truncation=True
+            sample['array'], sampling_rate=sampling_rate, max_length=max_length, truncation=True
         )
-        batch["input_values"] = inputs.input_values[0]
-        batch["input_length"] = len(inputs.input_values[0])
+        batch["input_length"] = len(inputs.input_values)
+        batch["input_values"] = inputs.input_values
+        batch["padding_mask"] = inputs.padding_mask
         return batch
 
     vectorized_datasets = dataset_dict.map(
@@ -95,13 +101,6 @@ def prepare_datasets(
         num_proc=preprocessing_num_workers,
         remove_columns=dataset_dict["train"].column_names,
     )
-
-    if min_length > 0.0:
-        vectorized_datasets = vectorized_datasets.filter(
-            lambda x: x > min_length,
-            num_proc=preprocessing_num_workers,
-            input_columns=["input_length"],
-        )
 
     vectorized_datasets = vectorized_datasets.remove_columns("input_length")
     return vectorized_datasets
@@ -117,6 +116,5 @@ class EncodecPretrainingDataCollator:
             padding="longest",
             return_tensors="pt",
         )
-
         return batch
 

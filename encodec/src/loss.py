@@ -14,7 +14,7 @@ class EncodecLossConfig(EncodecConfig):
             n_fft=1024,
             win_length=1024,
             hop_length=256,
-            n_mels=80,
+            n_mels=100,
             **kwargs,
     ):
         super().__init__(**kwargs)
@@ -43,7 +43,7 @@ class EncodecLossConfig(EncodecConfig):
             "n_fft": kwargs.pop("n_fft", 1024),
             "win_length": kwargs.pop("win_length", 1024),
             "hop_length": kwargs.pop("hop_length", 256),
-            "n_mels": kwargs.pop("n_mels", 80),
+            "n_mels": kwargs.pop("n_mels", 100),
         }
 
         config_dict = base_config.to_dict()
