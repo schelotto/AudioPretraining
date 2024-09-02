@@ -2,7 +2,7 @@ import torch
 
 from dataclasses import dataclass
 from typing import List, Dict, Optional, Union
-from transformers import Wav2Vec2ForPreTraining, Wav2Vec2FeatureExtractor
+from transformers import Wav2Vec2ForPreTraining, Wav2Vec2FeatureExtractor, BatchFeature
 from transformers.models.wav2vec2.modeling_wav2vec2 import _compute_mask_indices, _sample_negative_indices
 
 
@@ -15,7 +15,9 @@ class DataCollatorForWav2Vec2Pretraining:
     mask_time_prob: Optional[float] = 0.65
     mask_time_length: Optional[int] = 10
 
-    def __call__(self, features: List[Dict[str, Union[List[int], torch.Tensor]]]) -> Dict[str, torch.Tensor]:
+    def __call__(
+            self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
+    ) -> Union[Dict[str, torch.Tensor], BatchFeature]:
         batch = self.feature_extractor.pad(
             features,
             padding=self.padding,
