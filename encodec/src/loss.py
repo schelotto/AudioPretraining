@@ -112,3 +112,17 @@ class EncodecLoss(nn.Module):
         # Commitment loss
         loss_w = self.l2_loss(z.detach(), zq)
         return loss_t, loss_f, loss_g, feat_loss, loss_w
+
+    @staticmethod
+    def compute_discriminator_loss(real_outputs, fake_outputs):
+        """
+        Compute the discriminator loss based on hinge loss.
+        """
+        loss_d = 0.0
+        K = len(real_outputs)
+        for real_output, fake_output in zip(real_outputs, fake_outputs):
+            real_loss = torch.mean(torch.clamp(1.0 - real_output, min=0.0))
+            fake_loss = torch.mean(torch.clamp(1.0 + fake_output, min=0.0))
+            loss_d += real_loss + fake_loss
+        loss_d /= K
+        return loss_d
